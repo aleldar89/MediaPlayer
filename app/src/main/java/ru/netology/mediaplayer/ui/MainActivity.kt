@@ -49,6 +49,14 @@ class MainActivity : AppCompatActivity() {
             artistName.text = viewmodel.data.value?.artist
             published.text = viewmodel.data.value?.published
             genre.text = viewmodel.data.value?.genre
+
+            playAlbum.setOnClickListener {
+                observer.apply {
+                    mediaPlayer?.setDataSource(
+                        BuildConfig.BASE_URL + "1.mp3"
+                    )
+                }.play()
+            }
         }
 
         binding.list.adapter = adapter

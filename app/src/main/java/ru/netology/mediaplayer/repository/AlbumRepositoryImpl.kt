@@ -2,6 +2,8 @@ package ru.netology.mediaplayer.repository
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.netology.mediaplayer.BuildConfig
@@ -26,14 +28,16 @@ class AlbumRepositoryImpl: AlbumRepository  {
             .url(BASE_URL)
             .build()
 
-        return client.newCall(request)
-            .execute()
-            .let {
-                it.body?.string() ?: throw RuntimeException("body is null")
-            }
-            .let {
-                gson.fromJson(it, typeToken.type)
-            }
+        return withContext(Dispatchers.IO) {
+            client.newCall(request)
+                .execute()
+                .let {
+                    it.body?.string() ?: throw RuntimeException("body is null")
+                }
+                .let {
+                    gson.fromJson(it, typeToken.type)
+                }
+        }
     }
 
 }
