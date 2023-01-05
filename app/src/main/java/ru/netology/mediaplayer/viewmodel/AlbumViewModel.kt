@@ -51,7 +51,7 @@ class AlbumViewModel : ViewModel() {
             try {
                 _data.value = repository.getAlbum().apply {
                     this.tracks.map {
-                        it.play = true
+                        it.play = false
                     }
                 }
                 _tracks.value = data.value?.tracks

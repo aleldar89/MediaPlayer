@@ -38,9 +38,9 @@ class TrackViewHolder(
 
             play.setImageResource(
                 if (track.play)
-                    R.drawable.ic_baseline_play_circle_24
+                    R.drawable.ic_baseline_pause_album_36
                 else
-                    R.drawable.ic_baseline_pause_circle_24
+                    R.drawable.ic_baseline_play_album_36
             )
 
             play.setOnClickListener {
