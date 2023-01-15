@@ -28,22 +28,19 @@ class AlbumViewModel : ViewModel() {
     val data: LiveData<Album>
         get() = _data
 
-    private val _tracks = MutableLiveData(emptyList<Track>())
-    val tracks: MutableLiveData<List<Track>>
-        get() = _tracks
-
     init {
         loadAlbum()
     }
 
     fun playPause(track: Track) {
-        val tracking = tracks.value?.map {
-            if (it.id != track.id)
-                it
-            else
-                it.copy(play = !it.play)
-        }
-        _tracks.value = tracking
+        val tracking = _data.value?.tracks.orEmpty()
+            .map {
+                if (it.id != track.id)
+                    it
+                else
+                    it.copy(play = !it.play)
+            }
+        _data.value = _data.value?.copy(tracks = tracking)
     }
 
     fun loadAlbum() {
@@ -54,7 +51,6 @@ class AlbumViewModel : ViewModel() {
                         it.play = false
                     }
                 }
-                _tracks.value = data.value?.tracks
             } catch (e: Exception) {
                 println("Album loading error")
             }

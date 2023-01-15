@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/Theme.AppCompat.DayNight"
-            app:constraint_referenced_ids="album, albumName, artist, artistName, published, genre" />
+            app:constraint_referenced_ids="album, albumName, artist, artistName, published, genre, list" />
 
         <TextView
             android:id="@+id/album"
