@@ -36,7 +36,7 @@ class AlbumViewModel : ViewModel() {
         val tracking = _data.value?.tracks.orEmpty()
             .map {
                 if (it.id != track.id)
-                    it
+                    it.copy(play = false) // Чтобы не было одновременно несколько треков в play
                 else
                     it.copy(play = !it.play)
             }

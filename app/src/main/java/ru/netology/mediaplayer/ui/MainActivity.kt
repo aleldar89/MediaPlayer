@@ -34,10 +34,49 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = TrackAdapter(object : OnInteractionListener {
             override fun onPlay(track: Track) {
-                trackId = track.id
-
                 observer.apply {
-                    /** если играет -> пауза */
+                    mediaPlayer?.setOnCompletionListener {
+                        val tracks = viewmodel.data.value?.tracks.orEmpty()
+                        val nextIndex = tracks.indexOfFirst {
+                            it.id == track.id
+                        }.takeIf {
+                            it >= 0
+                        }?.inc()
+                            .takeIf {
+                                it in tracks.indices
+                            } ?: 0
+
+                        val nextTrack = tracks[nextIndex]
+
+                        mediaPlayer?.stop()
+                        mediaPlayer?.release()
+                        mediaPlayer?.setDataSource(
+                            "${BuildConfig.BASE_URL}${nextTrack.id}.mp3"
+                        )
+                        observer.play()
+
+                        trackId = nextTrack.id
+
+                        viewmodel.playPause(nextTrack)
+                    }
+
+                    if (trackId != track.id) {
+                        mediaPlayer?.stop()
+                        mediaPlayer?.reset()
+                        mediaPlayer?.setDataSource(
+                            "${BuildConfig.BASE_URL}${track.id}.mp3"
+                        )
+                        observer.play()
+
+                        trackId = track.id
+
+                        viewmodel.playPause(track)
+                        return
+                    }
+
+                    trackId = track.id
+
+                    /** если играет - пауза */
                     if (mediaPlayer?.isPlaying == true) {
                         binding.playAlbum.setImageResource(R.drawable.ic_baseline_play_album_36)
                         currentPos = mediaPlayer?.currentPosition
@@ -49,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                             mediaPlayer?.stop()
                             mediaPlayer?.reset()
                             mediaPlayer?.setDataSource(
-                                BuildConfig.BASE_URL + track.id.toString() + ".mp3"
+                                "${BuildConfig.BASE_URL}${track.id}.mp3"
                             )
                             observer.play()
                         } else {
@@ -57,20 +96,6 @@ class MainActivity : AppCompatActivity() {
                             binding.playAlbum.setImageResource(R.drawable.ic_baseline_pause_album_36)
                             mediaPlayer?.seekTo(currentPos ?: 0)
                             mediaPlayer?.start()
-
-//TODO придумать проверку
-//                            if (currentTrackId == track.id) {
-//                                mediaPlayer?.seekTo(currentPos ?: 0)
-//                                mediaPlayer?.start()
-//                            } else {
-//                                mediaPlayer?.stop()
-//                                mediaPlayer?.reset()
-//                                mediaPlayer?.setDataSource(
-//                                    BuildConfig.BASE_URL + track.id.toString() + ".mp3"
-//                                )
-//                                observer.play()
-//                            }
-
                         }
                     }
                 }
@@ -79,22 +104,6 @@ class MainActivity : AppCompatActivity() {
                 viewmodel.playPause(track)
             }
         })
-
-        /** этот блок крашит */
-//        observer.apply {
-//            mediaPlayer?.setOnCompletionListener {
-//                currentPos = null
-//                mediaPlayer?.release()
-//                mediaPlayer = null
-//                mediaPlayer?.setDataSource(
-//                    if (trackId == viewmodel.data.value?.tracks?.last()?.id) {
-//                        BuildConfig.BASE_URL + "1.mp3"
-//                    } else {
-//                        BuildConfig.BASE_URL + (trackId + 1).toString() + ".mp3"
-//                    }
-//                )
-//            }
-//        }.play()
 
         binding.list.adapter = adapter
         viewmodel.data.observe(this) {
